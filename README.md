@@ -9,9 +9,7 @@ This is the **frontend** for a **Receipt Management System**, where users can **
 ### 🚀 Features  
 ✅ **User Authentication:** Signup & Login with Firebase Authentication 🔑  
 ✅ **Dashboard:** Navigate after login 📊  
-✅ **Service Credential Submission:** Securely store user information 🔒  
-✅ **Responsive UI:** Built with HTML, CSS, and JavaScript 🎨  
-
+  
 ---
 
 ### 🛠️ Tech Stack  
@@ -24,6 +22,7 @@ This is the **frontend** for a **Receipt Management System**, where users can **
 ### 🏃‍♂️ How to Run the Project  
 
 1. **Clone the repository (Using SSH):**  
+   For SSH setup follow this article: [SSH Setup Guide](https://medium.com/@anurupakarmakar.dgp18/ssh-simplified-how-to-securely-connect-and-clone-repositories-like-a-pro-e2efbf065de3)  
    ```bash
    git clone git@github.com:development-dynamic-lab/Receipt-Management-System-OCR.git
    cd Receipt-Management-System-OCR
