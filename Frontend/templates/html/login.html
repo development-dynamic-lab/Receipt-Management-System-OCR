@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Link to external stylesheet -->
+    <link rel="stylesheet" href="{{url_for('static',filename='/css/login.css')}}" type="text/css">
+    
+    <title>Receipt OCR</title>
+</head>
+
+<body>
+    <!-- Main Container -->
+    <div class="main">
+        
+        <!-- Left Section -->
+        <div class="left section"></div>
+        
+        <!-- Right Section -->
+        <div class="right section">
+            
+            <!-- Login Box -->
+            <div class="login-box">
+                
+                <!-- Login Fields -->
+                <div class="login-field">
+                    <input type="text" class="input-take input-usr-pw" id="username" name="username" placeholder="Username">
+                    <input type="password" class="input-take input-usr-pw" id="password" name="password" placeholder="Password">
+                    <button class="input-take login">Log In</button>
+                </div>
+                
+                <!-- Sign Up Section -->
+                <div class="signup-field">
+                    <p id="account-create-v1">Don't have an account yet?</p>
+                    <p id="account-create-v2">Create an account</p>
+                    <button class="signup">Sign Up</button>
+                </div>
+                
+            </div> <!-- End of Login Box -->
+            
+        </div> <!-- End of Right Section -->
+        
+    </div> <!-- End of Main Container -->
+
+    <!-- Link to external JavaScript file -->
+    <script src="{{ url_for('static', filename='/js/script.js') }}"></script>
+
+</body>
+
+</html>

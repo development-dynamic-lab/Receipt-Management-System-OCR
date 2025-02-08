@@ -1,0 +1,71 @@
+/* General Body Styling */
+body {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    font-family: "Poppins", serif;
+}
+
+/* Main Signup Container */
+.main_signup {
+    width: 30%;
+    height: 76%;
+    border-radius: 21px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0px 0px 10px 3px rgb(169, 159, 159);
+}
+
+/* Input Fields for Signup */
+.input-signup {
+    width: 90%;
+    height: 13%;
+    border-radius: 5px;
+    border: 1px solid rgb(214, 212, 212);
+}
+
+/* Styling for Email and Password Input */
+.signup-email-pw {
+    font-size: 18px;
+    padding: 13px;
+    box-sizing: border-box;
+}
+
+/* Placeholder Styling */
+input::placeholder {
+    font-size: 18px;
+    color: #888;
+}
+
+/* Signup Text */
+.signup-text {
+    font-size: 2rem;
+    color: blue;
+    text-decoration: underline;
+    text-decoration-color: blue; 
+}
+
+/* Signup Button (After Field) */
+.signup-after {
+    background-color: rgb(7, 7, 199);
+    color: white;
+    font-size: 1.6rem;
+    border-radius: 5px;
+    width: 90%;
+    height: 13%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Signup Button Hover Effect */
+.signup-after:hover {
+    transform: scale(1.01);
+    cursor: pointer;
+}
