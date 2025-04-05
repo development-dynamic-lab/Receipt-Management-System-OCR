@@ -1,4 +1,15 @@
+##Google gemini model
+google
+google.genai 
+
+
+##.env library
+python-dotenv
+
+##backend
 flask
 requests
-python-dotenv
+
+##firebase package
 firebase-admin
+

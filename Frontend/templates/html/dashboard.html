@@ -1,10 +1,67 @@
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link 
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" 
+        rel="stylesheet"
+    >
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/dashboard.css') }}" type="text/css">
 </head>
+
 <body>
-    <div class="main">hello</div>
+    <!-- ========== Login Area ========== -->
+    <div class="login-name-area">
+        <div class="login-name login-shapes"><span style="font-size: 2rem;">👤</span> John Smith</div>
+        <div class="back login-shapes"><span style="font-size: 2.4rem;">⮜</span> Back</div>
+    </div>
+
+    <!-- ========== Main Section ========== -->
+    <div class="top">
+        <!-- Image Preview Area -->
+        <div class="image-area main-area">
+            <div class="image-head title"><span style="font-size: 2rem;">📜</span> 領収書 (Receipts)</div>
+        </div>
+
+        <!-- Markdown (Data Summary) Area -->
+        <div class="markdown-area main-area">
+            <div class="chat-head title"><span style="font-size: 2rem;">🔠</span> データ概要 (Data Summary)</div>
+            <div class="markdown-loader" style="display: none;">
+                <div class="spinner"></div>
+                <div class="loading-text">Analyzing receipts...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== Bottom Buttons ========== -->
+    <div class="bottom">
+        <div class="button-area">
+            <!-- Hidden File Input -->
+            <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
+
+            <!-- Upload Button -->
+            <button class="upload-button button">
+                <span style="font-size: 2rem;">📤</span> Upload Image
+            </button>
+
+            <!-- Analyze Button -->
+            <button class="analyze-button button">
+                <span style="font-size: 2rem;">👀</span> Analyze Image
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== Scripts ========== -->
+    <script src="{{ url_for('static', filename='/js/dashboard.js') }}"></script>
 </body>
+
 </html>
