@@ -5,6 +5,7 @@ from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, auth
+from AI_OCR.modules.responses import ResponseAnalysis
 from AI_OCR.gemini import GeminiOCR
 
 # Load environment variables
@@ -96,43 +97,64 @@ def setcredentials():
 
 @app.route('/api/upload-images', methods=['POST'])
 def upload_images():
-    # Upload and process image files for OCR
-    uploaded_files = os.listdir(UPLOAD_FOLDER)
-    if len(uploaded_files) > 0:
-        for file in uploaded_files:
-            file_path = os.path.join(UPLOAD_FOLDER, file)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
+    try:
+        # Upload and process image files for OCR
+        uploaded_files = os.listdir(UPLOAD_FOLDER)
+        if len(uploaded_files) > 0:
+            for file in uploaded_files:
+                file_path = os.path.join(UPLOAD_FOLDER, file)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
 
-    if 'images' not in request.files:
-        return jsonify({'error': 'No files uploaded'}), 400
+        if 'images' not in request.files:
+            return jsonify({'error': 'No files uploaded'}), 400
 
-    files = request.files.getlist('images')
-    for file in files:
-        if file.filename:
-            file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-            file.save(file_path)
+        files = request.files.getlist('images')
+        for file in files:
+            if file.filename:
+                file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+                file.save(file_path)
+                
+        if(len(os.listdir(UPLOAD_FOLDER))> 5):
+            print("More than 5 images are passed for analysis")
+            return jsonify({'status': 'failed'})
+        
+        all_analysis = image_analysis()
+        print('All analysis: ',all_analysis)
+        
+        return jsonify({'status': 'success', 'all_analysis': all_analysis})
+    except Exception as e:
+        print(e)
 
-    all_analysis = imageAnalysis()
-    return jsonify({'status': 'success', 'all_analysis': all_analysis})
+def image_analysis():
+    try:
+        # Analyze uploaded images using Gemini OCR
+        gemini_api_key = os.getenv("GEMINI_API_KEY")
+        gemini_ocr = GeminiOCR(api_key=gemini_api_key)
 
-def imageAnalysis():
-    # Analyze uploaded images using Gemini OCR
-    gemini_api_key = os.getenv("GEMINI_API_KEY")
-    gemini_ocr = GeminiOCR(api_key=gemini_api_key)
+        receipts = os.listdir(UPLOAD_FOLDER)
+        raw_analysis = []
 
-    receipts = os.listdir(UPLOAD_FOLDER)
-    all_analysis = []
+        for receipt in receipts:
+            receipt_path = os.path.join(UPLOAD_FOLDER, receipt)
+            try:
+                analysis_text = gemini_ocr.analyze_receipt(image_file=receipt_path)
+            except Exception as e:
+                analysis_text = f"wrong_image"
+            raw_analysis.append(analysis_text)
+            
+        ##pre process the response 
+        final_analysis = ResponseAnalysis(analysis_list = raw_analysis).get_analysed_response()
+        return final_analysis
 
-    for receipt in receipts:
-        receipt_path = os.path.join(UPLOAD_FOLDER, receipt)
-        analysis_text = gemini_ocr.AnalyzeReceipt(image_file=receipt_path)
-        all_analysis.append(analysis_text)
-
-    return all_analysis
+    except Exception as e:
+        print(e)
 
 def run_app():
-    app.run(debug = True)
+    try:
+      app.run(debug = True)
+    except Exception as e:
+        print(e)
 
 # ------------------ RUN FLASK ------------------ #
 if __name__ == "__main__":

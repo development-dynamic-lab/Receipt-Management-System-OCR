@@ -119,15 +119,18 @@ body::before {
 
 .receipt-response {
     border: 1px solid rgb(204, 201, 201);
-    width: 97%;
+    min-width: 95%;
     min-height: 300px;
     margin: 10px;
     border-radius: 21px;
     padding: 21px;
     box-sizing: border-box;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-family: "Poppins", sans-serif;
     font-size: 1.07rem;
     text-align: justify;
+    overflow: auto;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom right, rgb(252, 224, 229), white);
 }
 
 /* ========== Bottom Section ========== */
@@ -197,6 +200,30 @@ body::before {
     100% { transform: rotate(360deg); }
 }
 
+/* ========== Table ========== */
+.receipt-response table {
+    min-width: 100%;
+    border-collapse: collapse;
+    margin: 0 10px 2rem 10px;
+}
+
+.receipt-response th,
+.receipt-response td {
+    border: 1px solid #444;
+    padding: 8px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.receipt-response th {
+    background-color: #f0f0f0;
+}
+
+.receipt-response h3 {
+    margin: 1rem 0 0.5rem;
+}
+
+
 /* ========== Optional Full Page Loader (Commented Out) ========== */
 /*
 .loader-overlay {
@@ -222,3 +249,32 @@ body::before {
     animation: spin 1s linear infinite;
 }
 */
+
+
+
+.preview-image-container {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 15px auto;
+}
+
+.preview-image-container h3 {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.2rem;
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Make the image preview taller and flexible */
+.preview-image {
+    width: 100%;
+    height: 500px; /* ⬅️ increased height */
+    background-size: contain; /* change from contain to cover for full-fit */
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
