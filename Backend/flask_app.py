@@ -1,12 +1,18 @@
-##Imports
 import os
 import requests
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
+
 import firebase_admin
 from firebase_admin import credentials, auth
 from AI_OCR.modules.responses import ResponseAnalysis
 from AI_OCR.gemini import GeminiOCR
+import shutil
+import threading
+import time
+from celery import Celery
 
 # Load environment variables
 load_dotenv()
@@ -18,18 +24,39 @@ DATABASE_DIR = os.path.abspath(os.path.join(BASE_DIR, "../Database"))
 FRONTEND_DIR = os.path.abspath(os.path.join(BASE_DIR, "../Frontend"))
 
 # Initialize Flask app with custom template/static folders
-app = Flask(__name__, 
+app = Flask(__name__,
             template_folder=os.path.join(FRONTEND_DIR, "templates"),
             static_folder=os.path.join(FRONTEND_DIR, "static"))
+app.secret_key = os.urandom(24)
+
+## Initialize the limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"]  # fallback for other routes
+)
 
 # Load Firebase credentials and initialize Firebase Admin SDK
 cred_path = os.path.join(DATABASE_DIR, "firebase", "receipt-ocr-27b54-firebase-adminsdk-fbsvc-be8e44e115.json")
 cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 
-# Set uploads folder path
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Celery configuration
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery.conf.update(app.config)
+    return celery
+
+app.config.update(
+    CELERY_BROKER_URL='redis://localhost:6379/0',  # Redis broker URL
+    CELERY_RESULT_BACKEND='redis://localhost:6379/0'
+)
+
+celery = make_celery(app)
 
 # ------------------ ROUTES ------------------ #
 
@@ -68,6 +95,8 @@ def getcredentials():
         user_uuid = result.get('localId')
 
         if 'idToken' in result:
+            # Store UUID in session
+            session['user_uuid'] = user_uuid
             return jsonify({
                 "loginName": personName,
                 "username": email,
@@ -95,10 +124,18 @@ def setcredentials():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@limiter.limit("5 per 1 minute")
 @app.route('/api/upload-images', methods=['POST'])
 def upload_images():
     try:
-        # Upload and process image files for OCR
+        user_uuid = session.get('user_uuid')
+        if not user_uuid:
+            return jsonify({'error': 'User not authenticated'}), 401
+
+        UPLOAD_FOLDER = os.path.join(BASE_DIR, user_uuid)
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        
+        # Check if the folder pre-exists and clear them all
         uploaded_files = os.listdir(UPLOAD_FOLDER)
         if len(uploaded_files) > 0:
             for file in uploaded_files:
@@ -108,25 +145,42 @@ def upload_images():
 
         if 'images' not in request.files:
             return jsonify({'error': 'No files uploaded'}), 400
-
+        
+        MAX_IMAGE_SIZE = 5 * 1024 * 1024  ## not more than 5MB
+        
         files = request.files.getlist('images')
         for file in files:
             if file.filename:
+                file.seek(0, os.SEEK_END)  # Move to end to get size
+                file_length = file.tell()
+                file.seek(0)  # Reset pointer back to start
+                
+                if file_length > MAX_IMAGE_SIZE:
+                    print("Image size exceeded", file_length)
+                    return jsonify({'error': f'File {file.filename} exceeds 5MB size limit'}), 400
                 file_path = os.path.join(UPLOAD_FOLDER, file.filename)
                 file.save(file_path)
-                
-        if(len(os.listdir(UPLOAD_FOLDER))> 5):
+
+        if len(os.listdir(UPLOAD_FOLDER)) > 5:
             print("More than 5 images are passed for analysis")
             return jsonify({'status': 'failed'})
         
-        all_analysis = image_analysis()
-        print('All analysis: ',all_analysis)
+        all_analysis = image_analysis.apply_async(args=[UPLOAD_FOLDER])
+        print('All analysis: ', all_analysis)
         
-        return jsonify({'status': 'success', 'all_analysis': all_analysis})
+        # Wait for the Celery task to complete and get the result
+        result = all_analysis.get()
+        
+        # Delete the folder after getting the result from Celery
+        delayed_delete(UPLOAD_FOLDER)
+
+        return jsonify({'status': 'success', 'all_analysis': result})
     except Exception as e:
         print(e)
 
-def image_analysis():
+# Celery task to analyze images in the background
+@celery.task
+def image_analysis(UPLOAD_FOLDER):
     try:
         # Analyze uploaded images using Gemini OCR
         gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -142,17 +196,28 @@ def image_analysis():
             except Exception as e:
                 analysis_text = f"wrong_image"
             raw_analysis.append(analysis_text)
-            
-        ##pre process the response 
-        final_analysis = ResponseAnalysis(analysis_list = raw_analysis).get_analysed_response()
+
+        ## Preprocess the response 
+        final_analysis = ResponseAnalysis(analysis_list=raw_analysis).get_analysed_response()
         return final_analysis
 
     except Exception as e:
         print(e)
+        return str(e)
+
+def delayed_delete(folder_path, delay=3):
+    def delete():
+        time.sleep(delay)
+        try:
+            shutil.rmtree(folder_path)
+            print(f"Deleted folder: {folder_path}")
+        except Exception as e:
+            print(f"Error deleting folder {folder_path}: {e}")
+    threading.Thread(target=delete).start()
 
 def run_app():
     try:
-      app.run(debug = True)
+        app.run(debug=True)
     except Exception as e:
         print(e)
 

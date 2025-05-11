@@ -9,6 +9,9 @@ python-dotenv
 ##backend
 flask
 requests
+Flask-Limiter
+celery 
+redis
 
 ##firebase package
 firebase-admin
