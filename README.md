@@ -1,7 +1,3 @@
-Absolutely! Here's your full updated **README.md** with the Redis and Celery setup instructions included under the "Run the Flask Application" section:
-
----
-
 # 🧾 Receipt Management System using OCR (with Gemini AI)
 
 The **Receipt Management System** is a full-stack web application that allows users to **sign up, log in, and upload receipts for analysis**. A key feature of this system is its integration with **Google's Gemini AI** for **Optical Character Recognition (OCR)** — enabling users to extract and manage receipt data efficiently from uploaded images.
