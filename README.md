@@ -143,9 +143,10 @@ Or register a new account using the signup page in the app.
 
 The `AI_OCR/gemini.py` file handles OCR by connecting with Google’s Gemini API. Users can upload receipt images via the dashboard, and the system will automatically extract and display the text content from the images using AI.
 
-This feature is already integrated and fully functional — just make sure your Google API key is added to your `.env` file!
+This feature is already integrated and fully functional — just make sure your Google API key is added to your
+ `.env` file!
 
 ---
 
 ## Demo
-https://github.com/user-attachments/assets/56afe5e2-3857-483f-8f0f-bd4d80f84ace
+https://github.com/user-attachments/assets/40f00ba4-f8ef-4379-9b2f-0845f2a221d0
