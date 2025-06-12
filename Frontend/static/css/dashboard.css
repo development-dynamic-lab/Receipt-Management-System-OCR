@@ -1,5 +1,280 @@
-.main{
-    width: 300px;
+/* ========== Global Styles ========== */
+body {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url(../images/dashboard_image.png) center/cover no-repeat;
+    opacity: 0.8;
+    z-index: -1;
+}
+
+/* ========== Login Name Section ========== */
+.login-name-area {
+    height: 10vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.login-shapes {
+    font-size: 2rem;
+    font-family: "Poppins", sans-serif;
+    background-color: white;
+    border: 1px solid gray;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(18, 18, 99);
+    background: linear-gradient(to bottom right, #96f6cc, #9ae4ed);
+}
+
+.login-name {
+    min-width: 21%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.back {
+    width: 10%;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+}
+
+.back:hover {
+    transform: scale(1.07);
+}
+
+/* ========== Layout Structure ========== */
+.top {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 80vh;
+    margin: 5px 0px;
+}
+
+.main-area {
+    height: 80vh;
+    width: 45%;
+    background-color: white;
+    border-radius: 21px;
+    border: 1px solid rgb(227, 222, 222);
+    position: relative;
+}
+
+/* ========== Section Headers ========== */
+.image-head,
+.chat-head {
+    width: 100%;
+    height: 60px;
+    font-size: 2rem;
+    font-family: "Poppins", sans-serif;
+    background-color: white;
+    box-shadow: 0px 0px 3px 4px rgb(209, 208, 208);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    padding-left: 15px;
+}
+
+/* ========== Image Section ========== */
+.image-area {
+    width: 40%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    background: center/contain no-repeat;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* ========== Markdown Section ========== */
+.markdown-area {
+    width: 50%;
+    height: 80vh;
+    background-color: white;
+    border-radius: 21px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.receipt-response {
+    border: 1px solid rgb(204, 201, 201);
+    min-width: 95%;
+    min-height: 300px;
+    margin: 10px;
+    border-radius: 21px;
+    padding: 21px;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    font-size: 1.07rem;
+    text-align: justify;
+    overflow: auto;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom right, rgb(252, 224, 229), white);
+}
+
+/* ========== Bottom Section ========== */
+.bottom {
+    height: 10vh;
+    border: 1px solid rgb(215, 210, 210);
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.button-area {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    place-items: center;
+    width: 100%;
+}
+
+.button {
+    height: 50px;
+    border-radius: 21px;
+    font-family: "Poppins", sans-serif;
+    font-size: 1.21rem;
+    color: white;
+    background-color: rgb(8, 4, 108);
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
+}
+
+.button:hover {
+    background-color: rgb(237, 237, 15);
+    color: black;
+    transform: scale(1.1);
+}
+
+/* ========== Markdown Loader ========== */
+.markdown-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     height: 200px;
-    border: 1px solid black;
+    width: 100%;
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+    color: #1d1d1d;
+}
+
+.spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========== Table ========== */
+.receipt-response table {
+    min-width: 100%;
+    border-collapse: collapse;
+    margin: 0 10px 2rem 10px;
+}
+
+.receipt-response th,
+.receipt-response td {
+    border: 1px solid #444;
+    padding: 8px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.receipt-response th {
+    background-color: #f0f0f0;
+}
+
+.receipt-response h3 {
+    margin: 1rem 0 0.5rem;
+}
+
+
+/* ========== Optional Full Page Loader (Commented Out) ========== */
+/*
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(3px);
+}
+
+.loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+}
+*/
+
+
+
+.preview-image-container {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 15px auto;
+}
+
+.preview-image-container h3 {
+    font-family: "Poppins", sans-serif;
+    font-size: 1.2rem;
+    color: red;
+    margin-bottom: 10px;
+}
+
+/* Make the image preview taller and flexible */
+.preview-image {
+    width: 100%;
+    height: 500px; /* ⬅️ increased height */
+    background-size: contain; /* change from contain to cover for full-fit */
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
