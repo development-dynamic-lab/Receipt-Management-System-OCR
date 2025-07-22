@@ -177,7 +177,8 @@ def upload_images():
         
         # Wait for the Celery task to complete and get the result
         result = all_analysis.get()
-        action.store_receipts_for_user(user_uuid=user_uuid, receipts=result) ##new
+
+        action.store_receipts_for_user(user_uuid=user_uuid, receipts=result) 
         
         # Delete the folder after getting the result from Celery
         delayed_delete(UPLOAD_FOLDER)
