@@ -170,6 +170,7 @@ def upload_images():
         
         # Wait for the Celery task to complete and get the result
         result = all_analysis.get()
+        # print(result)
         
         # Delete the folder after getting the result from Celery
         delayed_delete(UPLOAD_FOLDER)
