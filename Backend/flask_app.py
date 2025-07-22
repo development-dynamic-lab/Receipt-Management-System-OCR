@@ -4,7 +4,8 @@ from flask import Flask, render_template, request, jsonify, session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
-
+from Database.MySQL import action  ##new
+from Llama_Agent.main import run_agent  ##new
 import firebase_admin
 from firebase_admin import credentials, auth
 from AI_OCR.modules.responses import ResponseAnalysis
@@ -75,6 +76,11 @@ def dashboard():
     # Render dashboard page
     return render_template('html/dashboard.html')
 
+@app.route('/agent')
+def agent():
+    # Render dashboard page
+    return render_template('html/agent.html')
+
 @app.route('/api/sendlogincredentials', methods=['POST'])
 def getcredentials():
     # Authenticate user with Firebase Authentication API
@@ -129,6 +135,7 @@ def setcredentials():
 def upload_images():
     try:
         user_uuid = session.get('user_uuid')
+        print("New login:", user_uuid)
         if not user_uuid:
             return jsonify({'error': 'User not authenticated'}), 401
 
@@ -170,7 +177,8 @@ def upload_images():
         
         # Wait for the Celery task to complete and get the result
         result = all_analysis.get()
-        # print(result)
+
+        action.store_receipts_for_user(user_uuid=user_uuid, receipts=result) 
         
         # Delete the folder after getting the result from Celery
         delayed_delete(UPLOAD_FOLDER)
@@ -215,6 +223,24 @@ def delayed_delete(folder_path, delay=3):
         except Exception as e:
             print(f"Error deleting folder {folder_path}: {e}")
     threading.Thread(target=delete).start()
+
+##llama agent 
+@app.route('/api/get_ai_response',methods=['POST']) 
+def text_response():
+    try:
+        user_uuid = session.get('user_uuid')
+        if not user_uuid:
+            return jsonify({'error': 'User not authenticated'}), 401
+        data = request.get_json()
+        user_input = data['user_input']
+        print("User Input:",user_input)
+    except Exception as e:
+        return jsonify({'error': 'Error getting response'}), 401
+    
+    response = run_agent(user_uuid=user_uuid, user_query=user_input)
+    print(response)
+    return jsonify({'botResponse':response})
+
 
 def run_app():
     try:
