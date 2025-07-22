@@ -32,11 +32,17 @@ RECEIPT_OCR/
 ## 🚀 Features
 
 ✅ User Signup & Login via Firebase
+
 ✅ Dashboard for submitting and managing credentials
+
 ✅ Google Gemini AI integration for OCR
+
 ✅ Image-to-Text extraction from uploaded receipts
+
 ✅ MySQL database integration to store structured data
+
 ✅ LLaMA3 AI agent (via Groq) for advanced automation
+
 🔐 Secure and modular backend architecture
 
 ---
@@ -241,5 +247,6 @@ mysql-connector-python
 
 ## 🎥 Demo
 
-[https://github.com/user-attachments/assets/40f00ba4-f8ef-4379-9b2f-0845f2a221d0](https://github.com/user-attachments/assets/40f00ba4-f8ef-4379-9b2f-0845f2a221d0)
+https://github.com/user-attachments/assets/e49c4e7f-bb92-4d01-a055-bf54c11fba21
+
 
