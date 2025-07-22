@@ -9,6 +9,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const analyze = document.querySelector('.analyze-button');
     const markdownArea = document.querySelector('.markdown-area');
     const userName = localStorage.getItem('loginName');
+    const askAI = document.querySelector('.ask-ai-button');
+
+    
+    // =============== Go to ask ai =============//
+    askAI.addEventListener('click', () => {
+        window.location.href = '/agent'; 
+    });
+    
 
     // ===== Display Logged-In Username ===== //
     if (userName && userDisplayElement) {

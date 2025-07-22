@@ -1,3 +1,4 @@
+
 # 🧾 Receipt Management System using OCR (with Gemini AI)
 
 The **Receipt Management System** is a full-stack web application that allows users to **sign up, log in, and upload receipts for analysis**. A key feature of this system is its integration with **Google's Gemini AI** for **Optical Character Recognition (OCR)** — enabling users to extract and manage receipt data efficiently from uploaded images.
@@ -14,9 +15,10 @@ RECEIPT_OCR/
 ├── Backend/             → Flask backend (flask_app.py)
 ├── Database/
 │   ├── firebase/        → Firebase config & setup
-│   └── PostgreSQL/      → PostgreSQL (optional for future)
+│   └── MySQL/           → MySQL schema and logic (users, receipts, items)
 ├── Frontend/            → HTML templates and static assets
 ├── Images/              → Example receipt images or assets
+├── Llama_Agent/         → AI agent logic using CrewAI and LLaMA3
 ├── visualPage/          → Static landing page (HTML/CSS/JS)
 ├── .env                 → Environment variables 
 ├── .gitignore
@@ -33,6 +35,8 @@ RECEIPT_OCR/
 ✅ Dashboard for submitting and managing credentials
 ✅ Google Gemini AI integration for OCR
 ✅ Image-to-Text extraction from uploaded receipts
+✅ MySQL database integration to store structured data
+✅ LLaMA3 AI agent (via Groq) for advanced automation
 🔐 Secure and modular backend architecture
 
 ---
@@ -46,6 +50,9 @@ Make sure you have the following before getting started:
 * Docker installed (for Redis)
 * Firebase API key (provided)
 * Google Gemini AI API key (you will generate this)
+* MySQL server running locally or remotely
+* Groq API key for LLaMA3 agent
+* Internet access to use hosted LLM endpoints (Gemini, Groq)
 
 ---
 
@@ -60,14 +67,14 @@ cd Receipt-Management-System-OCR
 
 ### 2️⃣ Create and Activate Virtual Environment
 
-* **Windows**:
+**Windows:**
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-* **macOS/Linux**:
+**macOS/Linux:**
 
 ```bash
 python3 -m venv venv
@@ -82,48 +89,91 @@ pip install -r requirements.txt
 
 ### 4️⃣ Configure Environment Variables
 
-Create a `.env` file in the root directory and paste the following (with your actual keys):
+Create a `.env` file in the root directory and add:
 
 ```
 FIREBASE_API_KEY=your_firebase_api_key_here
 GEMINI_API_KEY=your_google_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
+
+# MySQL credentials
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=your_password
+MYSQL_DATABASE=receipt_db
 ```
 
-* You must generate your own **Google API key** from [Google AI Studio](https://aistudio.google.com/apikey) for OCR.
+---
 
-### 5️⃣ Run the Flask Application
+### 5️⃣ Set Up MySQL Database
 
-Before running the Flask server, make sure the **Redis** container (used by Celery for background tasks) is running.
+Use the following schema in MySQL:
 
-#### 🧱 Start Redis with Docker
+```sql
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_uuid VARCHAR(64) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-If you're running Redis for the **first time**:
+CREATE TABLE IF NOT EXISTS receipts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    purchase_date DATE,
+    store_name VARCHAR(255),
+    total_amount DECIMAL(10, 2),
+    consumption_tax DECIMAL(10, 2),
+    payment_method VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    receipt_id INT,
+    english_name VARCHAR(255),
+    quantity INT,
+    unit_price DECIMAL(10, 2),
+    total_price DECIMAL(10, 2),
+    FOREIGN KEY (receipt_id) REFERENCES receipts(id) ON DELETE CASCADE
+);
+
+ALTER TABLE receipts
+ADD CONSTRAINT unique_receipt_entry
+UNIQUE (user_id, purchase_date, store_name, total_amount);
+```
+
+---
+
+### 6️⃣ Run Redis Server (Required for Celery Tasks)
 
 ```bash
 docker run -d --name my-redis -p 6379:6379 redis
 ```
 
-If you've already created the container earlier:
+Or restart if already created:
 
 ```bash
 docker restart my-redis
 ```
 
-#### 🔄 Start Celery Worker (in a new terminal)
+---
+
+### 7️⃣ Start Celery Worker
 
 ```bash
 celery -A Backend.flask_app.celery worker --loglevel=info --pool=solo
 ```
 
-> 💡 `--pool=solo` is used to run Celery in a single-threaded mode, which works well on Windows and for debugging purposes.
+---
 
-#### 🚀 Start Flask App (in another terminal)
+### 8️⃣ Start Flask App
 
 ```bash
 python app.py
 ```
 
-Once the server starts, open your browser and visit:
+Visit your app at:
 🌐 [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ---
@@ -132,8 +182,10 @@ Once the server starts, open your browser and visit:
 
 Use this test user to try out the login feature:
 
-**Email:** `anu@gmail.com`
-**Password:** `anu123`
+```
+Email:    anu@gmail.com  
+Password: anu123
+```
 
 Or register a new account using the signup page in the app.
 
@@ -143,10 +195,51 @@ Or register a new account using the signup page in the app.
 
 The `AI_OCR/gemini.py` file handles OCR by connecting with Google’s Gemini API. Users can upload receipt images via the dashboard, and the system will automatically extract and display the text content from the images using AI.
 
-This feature is already integrated and fully functional — just make sure your Google API key is added to your
- `.env` file!
+---
+
+## 🤖 AI Agent (LLaMA 3 via CrewAI)
+
+Inside the `Llama_Agent/` folder, the system includes a custom AI agent pipeline built using Groq API and Meta's LLaMA 3 70B model. This component performs intelligent receipt analysis tasks by interfacing directly with the Groq-hosted LLaMA3 model.
+
+* Dynamically builds a prompt using `prompt_template.py`
+* Sends the prompt to LLaMA 3 (70B) via Groq API `(groq_api.py)`
+* Parses structured response (e.g., item names, prices, payment method)
+* Extracts data intofrom MySQL via `db.py`
+
+The model is served using **Groq API**, which allows ultra-fast inference and structured results.
+
+You’ll need to provide your `GROQ_API_KEY` in `.env`.
 
 ---
 
-## Demo
-https://github.com/user-attachments/assets/40f00ba4-f8ef-4379-9b2f-0845f2a221d0
+## 📦 requirements.txt
+
+```
+# === Google Gemini Model ===
+google
+google-genai
+
+# === Environment Variables ===
+python-dotenv
+
+# === Backend (Flask + Related) ===
+flask
+requests
+Flask-Limiter
+celery
+redis
+
+# === Firebase ===
+firebase-admin
+
+# === Database (MySQL) ===
+mysql-connector-python
+
+```
+
+---
+
+## 🎥 Demo
+
+[https://github.com/user-attachments/assets/40f00ba4-f8ef-4379-9b2f-0845f2a221d0](https://github.com/user-attachments/assets/40f00ba4-f8ef-4379-9b2f-0845f2a221d0)
+

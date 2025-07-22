@@ -1,0 +1,43 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="../css/agent.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/agent.css') }}" type="text/css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <title>Ask AI</title>
+</head>
+
+<body>
+    <div class="chat-box">
+        <div class="chat-main chat-heading">✨Ask AI</div>
+        <div class="chat-main chat-screen">
+
+            <!-- <div class="main-wrap ai">
+                <img src="../images/ai_logo.png" alt="ai logo" width="50px" height="50px">
+                <div class="response-box ai-response">hello ai</div>
+            </div>
+            <div class="main-wrap human">
+                <div class="response-box human-response">hello human</div>
+                <img src="../images/human_logo.png" alt="human logo" width="50px" height="50px">
+            </div> -->
+
+
+        </div>
+        <div class="chat-main chat-area">
+            <input type="text" id="user-input">
+            <div class="send-button">➤</div>
+
+
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='/js/agent.js') }}"></script>
+
+</body>
+
+</html>
